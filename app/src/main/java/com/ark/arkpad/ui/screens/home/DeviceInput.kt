@@ -60,7 +60,7 @@ fun DeviceInputDialog(
 ) {
     var name = remember { mutableStateOf("") }
     var host = remember { mutableStateOf("") }
-    var port = remember { mutableStateOf("") }
+    var port = remember { mutableStateOf("11096") }
 
     val isHostValid by remember {
         derivedStateOf { isHostValid(host.value) }
