@@ -1,11 +1,11 @@
 [versions]
-agp = "8.10.0"
+agp = "8.11.1"
 kotlin = "2.0.21"
 ksp = "2.0.21-1.0.27"
 coreKtx = "1.16.0"
 lifecycleRuntimeKtx = "2.9.0"
 lifecycleViewmodelKtx = "2.9.0"
-composeBom = "2025.05.00"
+composeBom = "2025.05.01"
 composeActivity = "1.10.1"
 composeNavigation = "2.9.0"
 lazyColumnScrollbar = "2.2.0"
@@ -16,6 +16,7 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 json = "1.8.1"
 composeSensors = "0.2.0"
+datastorePreferences = "1.1.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +41,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "json" }
 compose-sensors = { group = "dev.ricknout.composesensors", name = "composesensors", version.ref = "composeSensors" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferences" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
