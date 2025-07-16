@@ -7,6 +7,7 @@ import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.DesktopWindows
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,27 +21,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ark.arkpad.model.Device
 import com.ark.arkpad.ui.components.FadeIn
-import com.ark.arkpad.ui.components.MultiSelectableList
-import com.ark.arkpad.ui.components.MultiSelectableScreen
-import com.ark.arkpad.ui.components.Placeholder
+import com.ark.arkpad.ui.components.multiselect.MultiSelectableList
+import com.ark.arkpad.ui.components.multiselect.MultiSelectableScreen
 
 @Composable
 fun HomeScreen(
+    deviceViewModel: DeviceViewModel,
     onNavigateToController: (Device) -> Unit,
-    deviceViewModel: DeviceViewModel = viewModel(
-        factory = DeviceViewModel.Factory,
-    ),
+    onNavigateToSettings: () -> Unit,
 ) {
     val context = LocalContext.current
     val devices by deviceViewModel.devices.collectAsState()
     val selectedDevices = remember { mutableStateListOf<Device>() }
-
+    val selectionState = remember { mutableStateOf(false) }
     var isDialogVisible by remember { mutableStateOf(false) }
+
     if (isDialogVisible) {
-        DeviceInputDialog(
+        NewDeviceDialog(
             onConfirm = { device ->
                 deviceViewModel.tryInsertDevice(context, device)
                 isDialogVisible = false
@@ -49,25 +48,40 @@ fun HomeScreen(
         )
     }
 
+    val clearSelection = {
+        selectedDevices.clear()
+        selectionState.value = false
+    }
+
     MultiSelectableScreen(
         title = "Devices",
+        selectionState = selectionState,
         selectedItems = selectedDevices,
+        onSelectionExit = clearSelection,
         floatingActionButton = {
             FloatingActionButton(onClick = { isDialogVisible = true }) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add a new device",
+                    contentDescription = "Add a new device.",
                 )
             }
         },
-        selectionModeActions = {
-            IconButton(onClick = {
-                deviceViewModel.deleteSelectedDevices(context, selectedDevices)
-                selectedDevices.clear()
-            }) {
+        actions = {
+            if (selectionState.value) {
+                IconButton(onClick = {
+                    deviceViewModel.deleteSelectedDevices(context, selectedDevices)
+                    clearSelection()
+                }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = "Delete selected devices.",
+                    )
+                }
+            }
+            IconButton(onClick = onNavigateToSettings) {
                 Icon(
-                    imageVector = Icons.Outlined.Delete,
-                    contentDescription = "Delete selected devices",
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = "Navigate to settings.",
                 )
             }
         },
@@ -83,6 +97,7 @@ fun HomeScreen(
                 )
             } else {
                 MultiSelectableList(
+                    selectionState = selectionState,
                     items = devices!!,
                     onItemClick = { device -> onNavigateToController(device) },
                     selectedItems = selectedDevices,

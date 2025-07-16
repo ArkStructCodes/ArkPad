@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class DeviceViewModel(private val dao: DeviceDao) : ViewModel() {
-    val devices = dao
+class DeviceViewModel(private val deviceDao: DeviceDao) : ViewModel() {
+    val devices = deviceDao
         .getAllDevices()
         .stateIn(
             scope = viewModelScope,
@@ -27,7 +27,7 @@ class DeviceViewModel(private val dao: DeviceDao) : ViewModel() {
     fun tryInsertDevice(context: Context, device: Device) {
         viewModelScope.launch {
             try {
-                dao.insertDevice(device)
+                deviceDao.insertDevice(device)
             } catch (_: SQLiteConstraintException) {
                 alert(context, "This device already exists.")
             }
@@ -36,7 +36,7 @@ class DeviceViewModel(private val dao: DeviceDao) : ViewModel() {
 
     fun deleteSelectedDevices(context: Context, devices: List<Device>) {
         viewModelScope.launch {
-            dao.deleteDevices(devices)
+            deviceDao.deleteDevices(devices)
         }
         val suffix = if (devices.size == 1) "" else "s"
         alert(context, "${devices.size} device$suffix deleted.")
@@ -46,8 +46,8 @@ class DeviceViewModel(private val dao: DeviceDao) : ViewModel() {
         val Factory = viewModelFactory {
             initializer {
                 val app = this[APPLICATION_KEY]!!
-                val dao = AppDatabase.getInstance(app).deviceDao()
-                DeviceViewModel(dao)
+                val deviceDao = AppDatabase.getInstance(app).deviceDao()
+                DeviceViewModel(deviceDao)
             }
         }
     }

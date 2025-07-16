@@ -34,7 +34,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.ark.arkpad.model.Device
 import com.ark.arkpad.ui.components.LimitedTextField
-import com.ark.arkpad.ui.components.SimpleDialog
+import com.ark.arkpad.ui.components.dialog.PromptDialog
 
 @Suppress("DEPRECATION")
 private fun isHostValid(host: String): Boolean {
@@ -46,21 +46,17 @@ private fun isHostValid(host: String): Boolean {
 }
 
 private fun isPortValid(port: String): Boolean {
-    return try {
-        port.toInt() in 0..65535
-    } catch (_: NumberFormatException) {
-        false
-    }
+    return port.toIntOrNull() in 0..65535
 }
 
 @Composable
-fun DeviceInputDialog(
+fun NewDeviceDialog(
     onConfirm: (device: Device) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    var name = remember { mutableStateOf("") }
-    var host = remember { mutableStateOf("") }
-    var port = remember { mutableStateOf("11096") }
+    val name = remember { mutableStateOf("") }
+    val host = remember { mutableStateOf("") }
+    val port = remember { mutableStateOf("11096") }
 
     val isHostValid by remember {
         derivedStateOf { isHostValid(host.value) }
@@ -68,18 +64,27 @@ fun DeviceInputDialog(
     val isPortValid by remember {
         derivedStateOf { isPortValid(port.value) }
     }
+    val canSubmit by remember {
+        derivedStateOf { name.value.isNotBlank() && isHostValid && isPortValid }
+    }
 
     val (first, second, third, confirm) = remember { FocusRequester.createRefs() }
 
-    SimpleDialog(
+    PromptDialog(
         title = "Add a New Device",
         onDismissRequest = onDismiss,
         confirmButton = {
             ElevatedButton(
                 onClick = {
-                    onConfirm(Device(name.value, host.value, port.value.toInt()))
+                    onConfirm(
+                        Device(
+                            name = name.value,
+                            host = host.value,
+                            port = port.value.toInt(),
+                        )
+                    )
                 },
-                enabled = name.value.isNotBlank() && isHostValid && isPortValid,
+                enabled = canSubmit,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                 ),
@@ -105,9 +110,7 @@ fun DeviceInputDialog(
                     capitalization = KeyboardCapitalization.Words,
                     imeAction = ImeAction.Next,
                 ),
-                keyboardActions = KeyboardActions(
-                    onNext = { second.requestFocus() },
-                ),
+                keyboardActions = KeyboardActions(onNext = { second.requestFocus() }),
                 modifier = Modifier.focusRequester(first),
             )
             Spacer(modifier = Modifier.size(8.dp))
@@ -121,9 +124,7 @@ fun DeviceInputDialog(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next,
                     ),
-                    keyboardActions = KeyboardActions(
-                        onNext = { third.requestFocus() },
-                    ),
+                    keyboardActions = KeyboardActions(onNext = { third.requestFocus() }),
                     modifier = Modifier
                         .weight(3f)
                         .focusRequester(second),
@@ -138,9 +139,7 @@ fun DeviceInputDialog(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Done,
                     ),
-                    keyboardActions = KeyboardActions(
-                        onDone = { confirm.requestFocus() },
-                    ),
+                    keyboardActions = KeyboardActions(onDone = { confirm.requestFocus() }),
                     modifier = Modifier
                         .weight(2f)
                         .focusRequester(third),
