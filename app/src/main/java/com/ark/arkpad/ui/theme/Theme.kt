@@ -29,6 +29,7 @@ fun ArkPadTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
+        typography = typography,
         content = content
     )
 }
