@@ -11,6 +11,18 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/**
+ * Single line text field with a maximum character limit and a character counter. Displays error
+ * when the input is invalid and non-empty.
+ *
+ * @param input mutable state containing the current text input
+ * @param maxLength maximum number of characters allowed
+ * @param label label to display above the input
+ * @param modifier [Modifier] to be applied to the text field
+ * @param isValid whether the current input is valid
+ * @param keyboardOptions software keyboard options
+ * @param keyboardActions callbacks for IME actions emitted by the input service
+ */
 @Composable
 fun LimitedTextField(
     input: MutableState<String>,

@@ -15,6 +15,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 
+/**
+ * Fades in content on the first composition.
+ *
+ * @param modifier [Modifier] to be applied to the box within
+ * @param animationSpec animation to use for the fade transition
+ * @param content contents to fade in
+ */
 @Composable
 fun FadeIn(
     modifier: Modifier = Modifier,

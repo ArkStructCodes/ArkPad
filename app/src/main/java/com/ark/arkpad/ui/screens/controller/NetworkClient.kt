@@ -26,7 +26,7 @@ private enum class Response(val code: UByte) {
         fun tryFrom(code: UByte): Response {
             return Response.entries
                 .firstOrNull { it.code == code }
-                ?: throw IllegalArgumentException("response code is invalid")
+                ?: throw IllegalArgumentException("Response code is invalid.")
         }
     }
 }
@@ -58,9 +58,9 @@ class NetworkClient(
         } catch (e: Exception) {
             when (e) {
                 is SocketException,
-                is IOException -> throw ClientException("not connected to the network")
+                is IOException -> throw ClientException("Not connected to the network.")
 
-                else -> throw ClientException("an unexpected error occurred, ${e.message}")
+                else -> throw ClientException("An unexpected error occurred, ${e.message}.")
             }
         }
     }
@@ -71,7 +71,7 @@ class NetworkClient(
         try {
             socket.receive(packet)
         } catch (_: Exception) {
-            throw ClientException("no response received from device")
+            throw ClientException("No response received from device.")
         }
         val responseCode = buffer.first().toUByte()
         return Response.tryFrom(responseCode)
@@ -79,43 +79,43 @@ class NetworkClient(
 
     fun connect() {
         if (isConnected) {
-            throw ClientException("already connected to the device")
+            throw ClientException("Already connected to the device.")
         }
         val address = Inet4Address.getByName(host)
         socket.connect(address, port)
         send(Message.CONNECT, byteArrayOf(0x45, 0x45))
         when (receive()) {
             Response.CONNECTION_SUCCESS -> Unit
-            Response.CONNECTION_FAILURE -> throw ClientException("connection refused by device")
+            Response.CONNECTION_FAILURE -> throw ClientException("Connection refused by device.")
             else -> throw IllegalStateException()
         }
     }
 
     fun emit(payload: ByteArray) {
         if (!isConnected) {
-            throw ClientException("cannot emit, not connected to the device")
+            throw ClientException("Cannot emit, not connected to the device.")
         }
         send(Message.DATA, payload)
     }
 
     fun disconnect() {
         if (!isConnected) {
-            throw ClientException("cannot disconnect, not connected to device")
+            throw ClientException("Cannot disconnect, not connected to device.")
         }
         send(Message.DISCONNECT, null)
         if (receive() != Response.DISCONNECTED) {
-            throw ClientException("did not receive the expected disconnect confirmation")
+            throw ClientException("Did not receive the expected disconnect confirmation.")
         }
         socket.disconnect()
     }
 
     fun ping() {
         if (!isConnected) {
-            throw ClientException("cannot ping, not connected to device")
+            throw ClientException("Cannot ping, not connected to device.")
         }
         send(Message.PING, null)
         if (receive() != Response.PONG) {
-            throw ClientException("did not receive the expected ping response")
+            throw ClientException("Did not receive the expected ping response.")
         }
     }
 }
